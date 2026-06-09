@@ -1,137 +1,61 @@
--- =========================================================================
--- NIVEL 1: CONSULTAS BÁSICAS Y AGREGACIÓN
--- =========================================================================
--- 1. Listar los artistas verificados ordenados de mayor a menor cantidad de seguidores
+-- INSERTAR USUARIOS
+INSERT INTO Usuario (ID, Nombre, Seguidores) VALUES
+(1, 'Juan Pérez', 10),
+(2, 'Drake(Fan)', 50),
+(3, 'Estudiante', 500);
 
-SELECT *
-FROM ARTISTA 
-WHERE VERIFICADO=TRUE
-ORDER BY SEGUIDORES ASC;
-
--- 2. Obtener el total de reproducciones de TODAS las canciones de la plataforma
-
-SELECT SUM(REPRODUCCIONES)
-FROM CANCION;
+INSERT INTO Usuario (Nombre, Seguidores) VALUES
+('Francisco', 1000); --ID=4 (AUTOINCREMENTAL)
 
 
--- 3. Encontrar las 5 canciones más largas (Duracion)
+-- INSERTAR ARTISTAS
+INSERT INTO Artista (ID, Nombre, Oyentes, Verificado, Cancion_Mas_Escuchada, Seguidores) VALUES
+(1, 'Drake', 8000000, TRUE, NULL, 150000),
+(2, 'Bad Bunny', 5000000, TRUE, NULL, 3000000),
+(3, 'Banda De Garage', 50, FALSE, NULL, 12),
+(4, 'Artista Fantasma', 0, FALSE, NULL, 0);
 
-SELECT NOMBRE,DURACION
-FROM CANCION
-ORDER BY DURACION DESC LIMIT(5);
-
--- =========================================================================
--- NIVEL 2: AGRUPAMIENTOS (GROUP BY & HAVING)
--- =========================================================================
-
--- 4. Calcular cuántas canciones tiene cada artista
-SELECT A.NOMBRE,COUNT(C.ID_ARTISTA) AS CANT_CANCIONES
-FROM ARTISTA A
-LEFT JOIN CANCION C ON A.ID=C.ID_ARTISTA 
-GROUP BY A.ID,A.NOMBRE;
-
--- 5. Listar los IDs de los artistas que tengan un promedio de reproducciones mayor a 500.000
-SELECT A.NOMBRE,AVG(C.REPRODUCCIONES)
-FROM ARTISTA A
-INNER JOIN CANCION C ON A.ID=C.ID_ARTISTA 
-GROUP BY C.ID_ARTISTA,A.NOMBRE
-HAVING AVG(C.REPRODUCCIONES)>500000;
+-- INSERTAR CANCIONES
+INSERT INTO Cancion (Nombre, ID_Artista, Reproducciones, Duracion, Portada) VALUES
+('MIA', 2, 1200000, '00:03:30', 'http://imagen1.jpg'),
+('One dance', 1, 600000, '00:02:53', 'http://imagen2.jpg'),
+('Summers Over Interlude', 1, 40000, '00:01:46', 'http://imagen3.jpg'),
+('Tema de Garage', 3, 15, '00:04:10', 'http://imagen4.jpg'),
+('DtMF', 2, 300000, '00:03:57', 'http://imagen5.jpg'),
+('NUEVAYoL', 2, 600000, '00:03:03', 'http://imagen6.jpg'),
+('Gently', 1, 700000, '00:03:24', 'http://imagen6.jpg');
 
 
-
--- =========================================================================
--- NIVEL 3: RELACIONES ENTRE TABLAS (JOINS)
--- =========================================================================
-
--- 6. Mostrar el nombre del artista, el nombre de la canción y sus reproducciones 
-SELECT A.NOMBRE,C.NOMBRE,C.REPRODUCCIONES
-FROM CANCION C
-INNER JOIN ARTISTA A ON A.ID=C.ID_ARTISTA;
+-- INSERTAR LISTAS DE REPRODUCCIÓN
+INSERT INTO Lista_Reproduccion (ID, ID_Usuario, Nombre, Publica, Aleatorio, Descripcion,Fecha_Creacion) VALUES
+(1, 1, 'Canciones 2026', TRUE, FALSE, 'Para escuchar programando','01/12/24'),
+(2, 2, 'Para mi', FALSE, TRUE, 'Privada','01/12/23')
+(3, 3, 'Solo Bad bunny', TRUE, FALSE, '');
 
 
+-- ASOCIAR CANCIONES A LAS LISTAS (Lista_Cancion)
+INSERT INTO Lista_Cancion (ID_Lista, ID_Usuario, Nombre_cancion, ID_Artista) VALUES
+(1, 1, 'One dance', 1),
+(1, 1, 'MIA', 2),
+(2, 2, 'Tema de Garage', 3),
+(3, 3, 'DtMF', 2),
+(3, 3, 'NUEVAYoL', 2),
+(3, 3, 'MIA', 2);
 
--- 7. Listar los nombres de las canciones que están en la lista de reproducción ID = 1 del Usuario ID = 1
-SELECT C.NOMBRE
-FROM CANCION C
-INNER JOIN LISTA_CANCION LC ON LC.NOMBRE_CANCION=C.NOMBRE AND LC.ID_ARTISTA=C.ID_ARTISTA
-WHERE LC.ID_LISTA=1 AND LC.ID_USUARIO=1;
+-- INSERTAR COLABORACIÓN (Feat_Cancion)
+INSERT INTO Feat_Cancion (Nombre_cancion, ID_Artista, ID_Artista_feat) VALUES
+('MIA', 2, 1),
+('Gently', 1, 2);
 
+--INSERTAMOS CANCIONES MAS ESCUCHADAS DE LOS ARTISTAS
+UPDATE ARTISTA SET CANCION_MAS_ESCUCHADA=(SELECT NOMBRE FROM CANCION WHERE NOMBRE='One dance') 
+WHERE ID=1;
 
--- 8. Mostrar las canciones que tienen un artista invitado (Feat), mostrando el nombre de la canción, 
--- el nombre del artista principal y el nombre del artista invitado.
-SELECT C.NOMBRE,A.NOMBRE,FEAT.NOMBRE AS NOMBRE_FEAT
-FROM CANCION C
-INNER JOIN FEAT_CANCION FC ON FC.NOMBRE_CANCION=C.NOMBRE AND FC.ID_ARTISTA=C.ID_ARTISTA
-INNER JOIN ARTISTA A ON A.ID=FC.ID_ARTISTA
-INNER JOIN ARTISTA FEAT ON FEAT.ID=FC.ID_ARTISTA_FEAT;
+UPDATE ARTISTA SET CANCION_MAS_ESCUCHADA=(SELECT NOMBRE FROM CANCION WHERE NOMBRE='MIA') 
+WHERE ID=2;
 
-
--- =========================================================================
--- NIVEL 4: SUBCONSULTAS Y OPERADORES AVANZADOS
--- =========================================================================
-
--- 9. Encontrar los nombres de los usuarios que son seguidos por mas personas que el promedio de seguidores global
-SELECT NOMBRE
-FROM USUARIO
-WHERE SEGUIDORES>(SELECT AVG(SEGUIDORES) FROM USUARIO);
-
--- 10. Listar los artistas que NO tienen ninguna canción registrada todavía
-
-SELECT A.NOMBRE
-FROM ARTISTA A
-EXCEPT
-SELECT A.NOMBRE
-FROM CANCION C
-INNER JOIN ARTISTA A ON A.ID=C.ID_ARTISTA;
-
--- 11. Obtener una lista única de todos los nombres de usuarios y nombres de artistas en la plataforma
-SELECT NOMBRE
-FROM ARTISTA
-UNION
-SELECT NOMBRE
-FROM USUARIO;
-
--- =========================================================================
--- NIVEL 5: SUBCONSULTAS CORRELACIONADAS
--- =========================================================================
-
--- 12. Listar las canciones que tienen más reproducciones que el PROMEDIO de las canciones de su PROPIO artista.
-SELECT C.NOMBRE
-FROM CANCION C
-WHERE C.REPRODUCCIONES>(
-SELECT AVG(C2.REPRODUCCIONES)
-FROM CANCION C2
-WHERE C2.ID_ARTISTA=C.ID_ARTISTA
-)
-
-
--- 13. Encontrar los usuarios que tienen listas de reproducción, pero ÚNICAMENTE si TODAS sus listas son públicas.
-
-SELECT U.NOMBRE
-FROM USUARIO U
-INNER JOIN LISTA_REPRODUCCION LR ON LR.ID_USUARIO=U.ID
-GROUP BY U.ID,U.NOMBRE
-HAVING COUNT(*) = (
-SELECT COUNT(*)
-FROM USUARIO U2
-INNER JOIN LISTA_REPRODUCCION LR2 ON LR2.ID_USUARIO=U2.ID
-WHERE LR2.PUBLICA=TRUE AND U2.ID=U.ID
-)
-
--- 15. Encontrar el o los usuarios que agregaron a sus listas de reproducción ABSOLUTAMENTE TODAS las canciones del artista Bad bunny (ID=2).
-
-SELECT U.NOMBRE
-FROM USUARIO U
-INNER JOIN LISTA_REPRODUCCION LR ON LR.ID_USUARIO=U.ID
-INNER JOIN LISTA_CANCION LC ON LC.ID_LISTA=LR.ID
-WHERE LC.ID_ARTISTA=2
-GROUP BY U.ID,U.NOMBRE
-HAVING COUNT(*) = (
-SELECT COUNT(*)
-FROM ARTISTA A
-INNER JOIN CANCION C ON C.ID_ARTISTA=A.ID
-WHERE ID=2
-)
+UPDATE ARTISTA SET CANCION_MAS_ESCUCHADA=(SELECT NOMBRE FROM CANCION WHERE NOMBRE='Tema de Garage') 
+WHERE ID=3;
 
 
 

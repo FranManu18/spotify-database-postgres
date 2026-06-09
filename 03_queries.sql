@@ -118,24 +118,60 @@ INNER JOIN LISTA_REPRODUCCION LR2 ON LR2.ID_USUARIO=U2.ID
 WHERE LR2.PUBLICA=TRUE AND U2.ID=U.ID
 )
 
--- =========================================================================
--- NIVEL 7: CONSULTAS DE DIVISIÓN 
--- =========================================================================
-
 -- 15. Encontrar el o los usuarios que agregaron a sus listas de reproducción ABSOLUTAMENTE TODAS las canciones del artista Bad bunny (ID=2).
 
 SELECT U.NOMBRE
 FROM USUARIO U
-INNER JOIN LISTA_REPRODUCCION LR ON LR.ID_USUARIO=U.ID
-INNER JOIN LISTA_CANCION LC ON LC.ID_LISTA=LR.ID
-WHERE LC.ID_ARTISTA=2
-GROUP BY U.ID,U.NOMBRE
-HAVING COUNT(*) = (
-SELECT COUNT(*)
+WHERE NOT EXISTS (
+    WHERE C.ID_ARTISTA = 2
+    AND NOT EXISTS (
+        SELECT 1 
+        FROM LISTA_CANCION LC
+        WHERE LC.ID_USUARIO = U.ID 
+          AND LC.NOMBRE_CANCION = C.NOMBRE 
+          AND LC.ID_ARTISTA = C.ID_ARTISTA
+    )
+);
+
+-- =========================================================================
+-- NIVEL 6: CONSULTAS AVANZADAS DE RENDIMIENTO
+-- =========================================================================
+
+-- 16. Encontrar el o los artistas que tengan la mayor cantidad absoluta de canciones en la plataforma (Manejo de máximos con empates).
+
+SELECT A.NOMBRE, COUNT(C.ID_ARTISTA) AS TOTAL_CANCIONES
 FROM ARTISTA A
-INNER JOIN CANCION C ON C.ID_ARTISTA=A.ID
-WHERE ID=2
-)
+INNER JOIN CANCION C ON A.ID = C.ID_ARTISTA
+GROUP BY A.ID, A.NOMBRE
+HAVING COUNT(C.ID_ARTISTA) = (
+    SELECT MAX(CANTIDAD)
+    FROM (
+        SELECT COUNT(ID_ARTISTA) AS CANTIDAD 
+        FROM CANCION 
+        GROUP BY ID_ARTISTA
+    ) AS SUB
+);
 
+-- 17. Listar los usuarios que crearon listas de reproducción durante el año 2023, 
+-- pero que nunca crearon ninguna lista durante el año 2024 (Filtro temporal exclusivo con fechas reales).
 
+SELECT U.NOMBRE
+FROM USUARIO U
+INNER JOIN LISTA_REPRODUCCION LR ON LR.ID_USUARIO=U.ID
+WHERE LR.FECHA_CREACION >= '2023-01-01' AND LR.FECHA_CREACION <= '2023-12-31'
+EXCEPT
+SELECT U.NOMBRE
+FROM USUARIO U
+INNER JOIN LISTA_REPRODUCCION LR ON LR.ID_USUARIO=U.ID
+WHERE LR.FECHA_CREACION >= '2024-01-01' AND LR.FECHA_CREACION <= '2024-12-31'
 
+-- 18. Mostrar los nombres de los artistas que tengan canciones en las que sean el artista principal y
+-- en las que sean el feat(Intersección de roles).
+
+SELECT A.NOMBRE
+FROM ARTISTA A
+INNER JOIN FEAT_CANCION FC ON FC.ID_ARTISTA=A.ID
+INTERSECT
+SELECT A.NOMBRE
+FROM ARTISTA A
+INNER JOIN FEAT_CANCION FC ON FC.ID_ARTISTA_FEAT=A.ID
