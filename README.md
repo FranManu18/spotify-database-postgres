@@ -73,7 +73,7 @@ HAVING COUNT(*) = (
 );
 ```
 
-### 🏆 Resolución de División Relacional 
+###  Resolución de División Relacional 
 Consulta diseñada para resolver el problema de división relacional: encontrar qué usuarios agregaron a sus listas de reproducción absolutamente todas las canciones de un artista específico (Bad Bunny - ID 2). Se logra comparando las canciones del artista dentro de las listas del usuario contra el total general de temas que posee dicho artista en el catálogo.
 
 ```sql
