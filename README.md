@@ -21,14 +21,49 @@ El diseño cuenta con **6 tablas** optimizadas que modelan la interacción entre
 
 ---
 
+## 🚀 Endpoints de la API (Documentación de Rutas)
+
+La API implementa una arquitectura REST con endpoints testeados y validados mediante **Postman**:
+
+### 👨‍🎤 Artistas (`/artistas`)
+* `GET /artistas` - Lista todos los artistas disponibles.
+* `GET /artistas/{id}` - Obtiene un artista específico mediante su ID.
+* `GET /artistas/buscar?nombre=...` - Buscador de artistas por coincidencia parcial de nombre.
+* `GET /artistas/verificados` - Filtra únicamente los artistas con cuenta verificada.
+* `GET /artistas/paginado?page=0&size=10&sort=id` - Listado paginado y ordenado (por defecto por ID).
+* `POST /artistas` - Registra un nuevo artista en el catálogo.
+* `POST /artistas/limpieza-verificados?minSeguidores=...` - Quita masivamente la verificación a los artistas que no alcancen el mínimo de seguidores requerido.
+* `PUT /artistas/{id}` - Actualiza por completo la información de un artista existente.
+* `DELETE /artistas/{id}` - Elimina un artista del sistema por su ID.
+
+### 🎧 Canciones (`/cancion`)
+* `GET /cancion` - Lista el catálogo completo de canciones.
+* `GET /cancion/{nombre}` - Busca canciones por coincidencia parcial en su nombre.
+* `GET /cancion/{idArtista}/{nombre}` - Obtiene una canción específica mediante su clave compuesta.
+* `GET /cancion/masReproducidas?numero=...` - Retorna un top de las canciones más escuchadas según el límite indicado.
+* `GET /cancion/paginado?page=0&size=10&sort=reproducciones` - Listado paginado de canciones (ordenado por defecto por reproducciones).
+* `POST /cancion` - Registra un track asociado a la clave compuesta `(idArtista, nombre)`. Soporta tipo de dato `INTERVAL` de PostgreSQL mapeado con `java.time.Duration`.
+* `PUT /cancion/{idArtista}/{nombre}` - Actualiza los datos de una canción identificada por su clave compuesta.
+* `DELETE /cancion/{idArtista}/{nombre}` - Elimina físicamente una canción usando sus dos identificadores.
+
+---
+
 ## 📂 Estructura del Repositorio
 
-El proyecto se encuentra modularizado de la siguiente manera para facilitar su despliegue:
+El proyecto se encuentra modularizado dividiendo la capa de datos nativa de la lógica del servidor de aplicaciones backend:
 
-* 📄 `01_estructura.sql`: Contiene el código DDL para la creación de tablas, definición de tipos de datos (`INTERVAL`, `BOOLEAN`) y restricciones.
-* 📄 `02_data.sql`: Set de datos de prueba ("seed data") con escenarios reales para testear la lógica del negocio.
-* 📄 `03_queries.sql`: Banco de consultas ordenadas por complejidad.
-
+```plaintext
+spotify-database-postgres/
+├── database/                   # Capa de Base de Datos Nativa
+│   ├── 01_estructura.sql       # Código DDL (Creación de tablas, tipos e integridad)
+│   ├── 02_data.sql             # Set de datos de prueba ("seed data")
+│   └── 03_queries.sql          # Banco de consultas complejas en SQL puro
+├── spotify-api/                # Capa Backend (Servidor REST)
+│   ├── src/                    # Código fuente Java organizado en capas (Model, Repository, Service, Controller)
+│   ├── pom.xml                 # Gestor de dependencias Maven (Spring Data JPA, PostgreSQL Driver)
+│   └── application.properties  # Configuración de entorno y credenciales de conexión
+└── README.md                   # Documentación general del proyecto
+```
 ---
 
 ## 🔍 Consultas Destacadas (Demostración de Habilidades)

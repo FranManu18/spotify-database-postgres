@@ -1,3 +1,11 @@
+DROP TABLE IF EXISTS public.feat_cancion CASCADE;
+DROP TABLE IF EXISTS public.lista_cancion CASCADE;
+DROP TABLE IF EXISTS public.lista_reproduccion CASCADE;
+DROP TABLE IF EXISTS public.cancion CASCADE;
+DROP TABLE IF EXISTS public.artista CASCADE;
+DROP TABLE IF EXISTS public.usuario CASCADE;
+
+
 --
 -- PostgreSQL database dump
 --
