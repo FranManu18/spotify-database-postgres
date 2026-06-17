@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.spotify.api.model.Cancion;
+import com.spotify.api.service.ArtistaService;
 import com.spotify.api.service.CancionService;
 
 @RestController
@@ -23,6 +24,9 @@ public class CancionController {
 	 @Autowired
 	 private CancionService service;
 	 
+	 @Autowired
+	 private ArtistaService serviceArtista;
+	 
 	 @GetMapping
 	 public List<Cancion>getAll(){
 		 return service.listarTodas();
@@ -30,7 +34,9 @@ public class CancionController {
 	 
 	 @PostMapping
 	 public Cancion crearCancion(@RequestBody Cancion cancion) {
-		 return service.guardar(cancion);
+		 Cancion nuevaCancion=service.guardar(cancion);
+		 serviceArtista.actualizarCancionMasEscuchada(cancion.getIdArtista());
+		 return nuevaCancion;
 	 }
 	 
 	 @PutMapping("/{idArtista}/{nombre}")

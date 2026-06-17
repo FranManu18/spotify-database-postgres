@@ -19,7 +19,7 @@ import com.spotify.api.model.Artista;
 import com.spotify.api.service.ArtistaService;
 
 @RestController
-@RequestMapping("/artistas")
+@RequestMapping("/artista")
 public class ArtistaController {
 	  @Autowired
 	   private ArtistaService service;
@@ -28,13 +28,15 @@ public class ArtistaController {
 	   public List<Artista> getAll() { return service.listarTodos(); }
 
 	   @PostMapping
-	   public Artista crearArtista(@RequestBody Artista nuevoArtisa) {
-		   return service.guardar(nuevoArtisa);
+	   public Artista crearArtista(@RequestBody Artista nuevoArtista) {
+		   return service.guardar(nuevoArtista);
 	   }
 	   
 	   @PutMapping("/{id}")
 	   public Artista actualizarArtista(@PathVariable Integer id,@RequestBody Artista artistaEditado) {
-		   return service.actualizar(id, artistaEditado);
+		   Artista artistaActualizado=service.actualizar(id, artistaEditado);
+		   service.actualizarCancionMasEscuchada(artistaActualizado.getId());
+		   return artistaActualizado;
 	   }
 	   
 	   @DeleteMapping("/{id}")

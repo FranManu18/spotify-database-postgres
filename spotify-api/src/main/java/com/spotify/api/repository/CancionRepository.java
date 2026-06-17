@@ -18,4 +18,10 @@ public interface CancionRepository extends JpaRepository<Cancion, CancionId>{
 	List<Cancion> findByNombreContainingIgnoreCaseOrderByReproduccionesDesc(String nombre);
 
 	List<Cancion> findByReproduccionesGreaterThan(Integer reproducciones);
+
+	Optional<Cancion>findFirstByIdArtistaOrderByReproduccionesDesc(Integer idArtista);
+	
+	@Modifying   
+    @Transactional
+	void deleteByIdArtista(Integer id);
 }

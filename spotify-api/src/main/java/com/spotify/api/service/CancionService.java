@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.spotify.api.exception.ResourceNotFoundException;
 import com.spotify.api.model.Artista;
 import com.spotify.api.model.Cancion;
 import com.spotify.api.model.CancionId;
@@ -21,6 +22,13 @@ public class CancionService {
 	@Autowired
     private CancionRepository repo;
 	
+	
+	private void chequearClaves(CancionId id) {
+		 if(!repo.existsById(id)) {
+			 throw new ResourceNotFoundException("La cancion con el id de artista "+id.getIdArtista()+" y el nombre "+id.getNombre()+" no existe");
+		 }
+	}
+	
 	public List<Cancion> listarTodas(){
 		return repo.findAll();
 	}
@@ -30,11 +38,9 @@ public class CancionService {
 	}
 	
 	 public Cancion actualizar(Integer idArtista,String nombre,Cancion cancionNueva) {
-	     CancionId id=new CancionId(idArtista,nombre);
+		 CancionId id=new CancionId(idArtista,nombre);
+		 chequearClaves(id);
 		 Cancion cancion=repo.findById(id).orElse(null);
-		 if(cancion==null) {
-			 return null;
-		 }
 		 cancion.setReproducciones(cancionNueva.getReproducciones());
 		 cancion.setDuracion(cancionNueva.getDuracion());
 		 cancion.setPortada(cancionNueva.getPortada());
@@ -43,6 +49,8 @@ public class CancionService {
 	    
 	 public void eliminarPorId(Integer idArtista,String nombre) {
 		 CancionId id=new CancionId(idArtista,nombre);
+		 chequearClaves(id);
+		 repo.findById(id).orElse(null);
 		 repo.deleteById(id);
 	 }
 	    
@@ -56,6 +64,7 @@ public class CancionService {
 	 
 	 public Cancion buscarPorId(Integer idArtista,String nombre) {
 		 CancionId id=new CancionId(idArtista,nombre);
+		 chequearClaves(id);
 		 return repo.findById(id).orElse(null);
 	 }
 	 
