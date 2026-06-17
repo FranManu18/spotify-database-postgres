@@ -25,26 +25,36 @@ El diseño cuenta con **6 tablas** optimizadas que modelan la interacción entre
 
 La API implementa una arquitectura REST con endpoints testeados y validados mediante **Postman**:
 
-### 👨‍🎤 Artistas (`/artistas`)
-* `GET /artistas` - Lista todos los artistas disponibles.
-* `GET /artistas/{id}` - Obtiene un artista específico mediante su ID.
-* `GET /artistas/buscar?nombre=...` - Buscador de artistas por coincidencia parcial de nombre.
-* `GET /artistas/verificados` - Filtra únicamente los artistas con cuenta verificada.
-* `GET /artistas/paginado?page=0&size=10&sort=id` - Listado paginado y ordenado (por defecto por ID).
-* `POST /artistas` - Registra un nuevo artista en el catálogo.
-* `POST /artistas/limpieza-verificados?minSeguidores=...` - Quita masivamente la verificación a los artistas que no alcancen el mínimo de seguidores requerido.
-* `PUT /artistas/{id}` - Actualiza por completo la información de un artista existente.
-* `DELETE /artistas/{id}` - Elimina un artista del sistema por su ID.
+### 👨‍🎤 Módulo de Artistas (`/artista`)
+Gestiona los perfiles de los músicos, sus métricas de oyentes, seguidores y estado de verificación en la plataforma.
 
-### 🎧 Canciones (`/cancion`)
-* `GET /cancion` - Lista el catálogo completo de canciones.
-* `GET /cancion/{nombre}` - Busca canciones por coincidencia parcial en su nombre.
-* `GET /cancion/{idArtista}/{nombre}` - Obtiene una canción específica mediante su clave compuesta.
-* `GET /cancion/masReproducidas?numero=...` - Retorna un top de las canciones más escuchadas según el límite indicado.
-* `GET /cancion/paginado?page=0&size=10&sort=reproducciones` - Listado paginado de canciones (ordenado por defecto por reproducciones).
-* `POST /cancion` - Registra un track asociado a la clave compuesta `(idArtista, nombre)`. Soporta tipo de dato `INTERVAL` de PostgreSQL mapeado con `java.time.Duration`.
-* `PUT /cancion/{idArtista}/{nombre}` - Actualiza los datos de una canción identificada por su clave compuesta.
-* `DELETE /cancion/{idArtista}/{nombre}` - Elimina físicamente una canción usando sus dos identificadores.
+| Método | Endpoint | Descripción | Parámetros / Query Params |
+| :--- | :--- | :--- | :--- |
+| **GET** | `/artista` | Lista todos los artistas disponibles en el catálogo. | Ninguno |
+| **GET** | `/artista/{id}` | Obtiene la información detallada de un artista específico. | `id` *(Path Variable)* |
+| **GET** | `/artista/buscar` | Buscador de artistas por coincidencia parcial o exacta de su nombre. | `nombre` *(Query Param)* |
+| **GET** | `/artista/verificados` | Filtra y retorna únicamente los artistas con cuenta verificada (`TRUE`). | Ninguno |
+| **GET** | `/artista/paginado` | Listado paginado y ordenado de los artistas del sistema. | `page` (def: 0), `size` (def: 10), `sort` (def: id) |
+| **POST** | `/artista` | Registra y da de alta un nuevo artista en el catálogo global. | `RequestBody` *(JSON Artista)* |
+| **POST** | `/artista/limpieza-verificados` | **Operación de negocio:** Quita masivamente la verificación a artistas que no alcancen el mínimo de seguidores requerido. | `minSeguidores` *(Query Param)* |
+| **PUT** | `/artista/{id}` | Actualiza por completo la información de un artista e invoca la actualización automática de su canción más escuchada. | `id` *(Path)*, `RequestBody` *(JSON)* |
+| **DELETE** | `/artista/{id}` | Elimina un artista del sistema resolviendo transaccionalmente las restricciones de clave foránea (FK). | `id` *(Path Variable)* |
+
+---
+
+### 🎧 Módulo de Canciones (`/cancion`)
+Soporta el ciclo de vida completo de los tracks musicales. **Aplica Clave Primaria Compuesta** basada en `(idArtista, nombre)`.
+
+| Método | Endpoint | Descripción | Parámetros / Query Params |
+| :--- | :--- | :--- | :--- |
+| **GET** | `/cancion` | Lista el catálogo completo de canciones registradas en la base de datos. | Ninguno |
+| **GET** | `/cancion/{nombre}` | Busca canciones por coincidencia parcial en su nombre. | `nombre` *(Path Variable)* |
+| **GET** | `/cancion/{idArtista}/{nombre}` | Obtiene una canción específica mediante los dos campos de su clave compuesta. | `idArtista`, `nombre` *(Path Variables)* |
+| **GET** | `/cancion/masReproducidas` | Retorna un top de las canciones más escuchadas según el límite numérico indicado. | `numero` *(Query Param)* |
+| **GET** | `/cancion/paginado` | Listado paginado de canciones (ordenado por defecto por cantidad de reproducciones). | `page` (def: 0), `size` (def: 10), `sort` (def: reproducciones) |
+| **POST** | `/cancion` | Registra un track asociado a la PK `(idArtista, nombre)`. Soporta tipo de dato `INTERVAL` de PostgreSQL mapeado con `java.time.Duration` e impacta automáticamente en las métricas del artista. | `RequestBody` *(JSON Cancion)* |
+| **PUT** | `/cancion/{idArtista}/{nombre}` | Actualiza los metadatos de una canción identificada inequívocamente por su clave compuesta. | `idArtista`, `nombre` *(Path)*, `RequestBody` *(JSON)* |
+| **DELETE** | `/cancion/{idArtista}/{nombre}` | Elimina físicamente una canción del catálogo usando sus dos identificadores primarios. | `idArtista`, `nombre` *(Path Variables)* |
 
 ### 👤 Módulo de Usuarios (`/usuario`)
 Administra los datos de los oyentes registrados en la plataforma.
