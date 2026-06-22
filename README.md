@@ -149,6 +149,25 @@ Mapea los artistas invitados (`Feats`) en las canciones de otros artistas princi
 
 ---
 
+## 📖 Documentación Interactiva (Swagger UI)
+
+La API cuenta con documentación interactiva expuesta mediante **Springdoc OpenAPI v3**. Esto permite visualizar, explorar y probar de forma directa todos los endpoints del sistema desde el navegador, facilitando la integración y las pruebas de negocio.
+
+### 📌 Enlaces de Acceso
+Una vez que la aplicación Spring Boot esté ejecutándose localmente, podés acceder a través de las siguientes URLs:
+
+* **Interfaz Gráfica de Swagger UI:** [http://localhost:8081/swagger-ui/index.html](http://localhost:8081/swagger-ui/index.html)
+* **Especificación OpenAPI (JSON Raw):** [http://localhost:8081/v3/api-docs](http://localhost:8081/v3/api-docs)
+
+> 💡 *Nota: Los enlaces están configurados por defecto en el puerto `8081`. Si modificaste la propiedad `server.port` en tu archivo `application.properties`, asegurate de reemplazarlo por el puerto correspondiente.*
+
+### ⚡ Características de la Documentación:
+* **Orden Lógico y Jerárquico:** Los módulos están ordenados numéricamente (`1. Artistas`, `2. Canciones`, `3. Colaboraciones`, etc.) para reflejar el flujo de dependencias de las entidades.
+* **Detalle de Operaciones:** Cada método incluye un resumen corto (`summary`) y una descripción extendida (`description`) que explica la lógica interna (como los recalculos automáticos o manejos transaccionales en cascada).
+* **Modelos de Excepción:** Especifica qué respuestas de error puede devolver la API (por ejemplo, los estados `404` cuando un recurso no existe a través de `ResourceNotFoundException`).
+
+---
+
 ## 📂 Estructura del Repositorio
 
 El proyecto se encuentra modularizado dividiendo la capa de datos nativa de la lógica del servidor de aplicaciones backend:
