@@ -5,6 +5,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name="usuario")
@@ -14,8 +18,12 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
+	@NotBlank(message = "El nombre del usuario no puede estar vacío ni contener solo espacios.")
+    @Size(max = 100, message = "El nombre del usuario no puede superar los 100 caracteres.")
 	private String nombre;
 	
+	@NotNull(message = "Los seguidores no pueden ser nulos.")
+    @Min(value = 0, message = "Los seguidores no pueden ser menores a 0.")
 	private Integer seguidores;
 
 	public Integer getId() {

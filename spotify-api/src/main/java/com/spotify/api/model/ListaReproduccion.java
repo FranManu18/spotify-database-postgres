@@ -7,6 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table (name="lista_reproduccion")
@@ -19,12 +21,15 @@ public class ListaReproduccion {
 	@Id
 	private Integer id;
 	
+	@NotBlank(message = "El nombre de la lista no puede estar vacío ni contener solo espacios.")
+    @Size(max = 100, message = "El nombre de la lista no puede superar los 100 caracteres.")
 	private String nombre;
 	
 	private boolean publica;
 	
 	private boolean aleatorio;
 	
+	 @Size(max = 200, message = "La descripcion de la lista no puede superar los 200 caracteres.")
 	private String descripcion;
 
 	public Integer getIdUsuario() {

@@ -12,6 +12,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 import org.hibernate.annotations.JdbcTypeCode; 
 import org.hibernate.type.SqlTypes;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -34,8 +39,12 @@ public class Cancion {
     private Integer idArtista;
 	
 	@Id
+	@NotBlank(message = "El nombre del artista no puede estar vacío ni contener solo espacios.")
+    @Size(max = 100, message = "El nombre del artista no puede superar los 100 caracteres.")
 	private String nombre;
 	
+	@NotNull(message = "Las reproducciones no pueden ser nulas.")
+    @Min(value = 0, message = "Las reproducciones no pueden ser menores a 0.")
 	private Integer reproducciones;
 	
 	@Column(columnDefinition = "interval")

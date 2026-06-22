@@ -1,6 +1,10 @@
 package com.spotify.api.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "artista")
@@ -9,9 +13,19 @@ public class Artista {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+	
+	@NotBlank(message = "El nombre del artista no puede estar vacío ni contener solo espacios.")
+    @Size(max = 100, message = "El nombre del artista no puede superar los 100 caracteres.")
     private String nombre;
+	
+	@NotNull(message = "Los oyentes mensuales no pueden ser nulos.")
+    @Min(value = 0, message = "Los oyentes mensuales no pueden ser menores a 0.")
     private Integer oyentes;
+	
     private Boolean verificado;
+    
+    @NotNull(message = "La cantidad de seguidores no puede ser nula.")
+    @Min(value = 0, message = "La cantidad de seguidores no puede ser menor a 0.")
     private Integer seguidores;
 
     @Column(name = "cancion_mas_escuchada")
